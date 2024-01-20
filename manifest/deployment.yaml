@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alan-app-deployment
+spec:
+  replicas: 1  # Número de réplicas de tu aplicación
+  selector:
+    matchLabels:
+      app: alan-app
+  template:
+    metadata:
+      labels:
+        app: alan-app
+    spec:
+      containers:
+      - name: alan-app
+        image: ajsosamartinez/alan_app_test:latest
+        imagePullPolicy: Always  # Asegura que siempre se jale la última imagen
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            memory: "64Mi"  # Memoria mínima requerida
+            cpu: "50m"  # CPU mínima requerida
+          limits:
+            memory: "128Mi"  # Memoria máxima requerida
+            cpu: "100m"  # CPU máxima requerida
+      imagePullSecrets:
+      - name: mi-docker-secret
