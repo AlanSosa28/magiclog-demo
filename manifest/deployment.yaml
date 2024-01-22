@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: alan-app-deployment
 spec:
-  replicas: 1  # Número de réplicas de tu aplicación
+  replicas: 1
   selector:
     matchLabels:
       app: alan-app
@@ -15,7 +15,7 @@ spec:
       containers:
       - name: alan-app
         image: ajsosamartinez/alan_app_test:latest
-        imagePullPolicy: Always  # Asegura que siempre se jale la última imagen
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
         resources:
