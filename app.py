@@ -22,7 +22,7 @@ def calculate_age():
         return jsonify({'error': 'The date provided is in the future'}), 400
     
     # Devolver la respuesta
-    return jsonify({'data': f'{name} is {age} years old'})
+    return jsonify({'data': f'{name} is {age} years old - demo'})
 
 # Iniciar la aplicación en modo debug para desarrollo
 if __name__ == '__main__':
