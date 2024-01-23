@@ -67,9 +67,36 @@ Details on how the application connects to AWS are as follows:
     └── service.yaml
 ```
 
-## Dockerfile
+# Dockerfile Description and Security Aspects
 
-The Dockerfile in the `docker` directory outlines the steps to create a Docker image of the Flask application. The image is based on Python 3.9-slim and includes all necessary dependencies.
+The Dockerfile provided for the Flask application employs several best practices for security and efficiency:
+
+1. **Base Image**:
+   - `FROM python:3.9-slim`: Utilizes an official Python base image, specifically the 'slim' variant, which is a minimized version containing only essential components. This reduces the overall image size and minimizes the attack surface by limiting the number of packages and potential vulnerabilities.
+
+2. **Package Installation**:
+   - The `RUN apt-get update` and `install` commands are used to install necessary system dependencies. The `--no-install-recommends` flag is included to avoid installing unnecessary packages, further reducing the image size and potential attack vectors.
+   - The command `rm -rf /var/lib/apt/lists/*` is used to clear the package manager cache. This removal reduces the image size and removes unnecessary files that could potentially include sensitive information.
+
+3. **Non-Root User**:
+   - `RUN useradd -m alan`: Creates a non-root user named 'alan' to run the application. This is a crucial security practice to mitigate the effects of a container breakout. If an attacker compromises the application, they would have limited permissions, unlike a root user.
+   - `USER alan`: Switches the user context to the non-root user 'alan'. All subsequent commands in the Dockerfile and the running container will execute with the permissions of this user.
+
+4. **Working Directory**:
+   - `WORKDIR /home/alan/app`: Sets the working directory to `/home/alan/app`. This directory becomes the default location for any RUN, CMD, ENTRYPOINT, COPY, and ADD instructions that follow in the Dockerfile.
+
+5. **Copying Application Files**:
+   - The `COPY` instructions transfer the application files `requirements.txt` and `app.py` into the container. They are owned by the non-root user 'alan', which aligns with the principle of least privilege.
+   - `RUN pip install`: Installs the Python dependencies listed in `requirements.txt`. The `--user` flag installs packages locally for the non-root user, and `--no-cache-dir` avoids caching the downloaded packages, which is good for security and minimizing image size.
+
+6. **Exposing Ports**:
+   - `EXPOSE 5000`: Exposes port 5000, which is the default port for Flask applications. This instruction is used for documentation purposes and does not actually publish the port.
+
+7. **Environment Variables**:
+   - `ENV FLASK_APP=app.py` and `ENV FLASK_RUN_HOST=0.0.0.0`: These environment variables are set for Flask. `FLASK_RUN_HOST=0.0.0.0` tells Flask to listen on all network interfaces, which is necessary in a containerized environment.
+
+8. **Running the Application**:
+   - `CMD ["python", "-m", "flask", "run"]`: The command to run the Flask application when the container starts. Using the array format for `CMD` ensures that the application is run directly and not within a shell, which is more secure and avoids any shell injection vulnerabilities.
 
 ## GitHub Actions Workflow (`deploy.yml`)
 
